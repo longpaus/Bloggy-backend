@@ -20,8 +20,8 @@ import java.util.function.Function;
 @Component
 public class JwtTokenProvider {
 
-//    @Value("${app.security.jwt.secret-key}")
-    private final SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256); // or HS384, HS512
+    @Value("${app.security.jwt.secret-key}")
+    private String key;
 
 
     @Value("${app.security.jwt.expiration}")
@@ -39,7 +39,7 @@ public class JwtTokenProvider {
     public Claims extractAllClaims(String token) {
         return Jwts
                 .parserBuilder()
-                .setSigningKey(key)
+                .setSigningKey(getSignInKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -51,8 +51,8 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setSubject((userPrincipal.getUsername()))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date((new Date()).getTime() + expiration))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -84,8 +84,8 @@ public class JwtTokenProvider {
         return extractClaim(token, Claims::getExpiration);
     }
 
-//    private Key getSignInKey() {
-//        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-//        return Keys.hmacShaKeyFor(keyBytes);
-//    }
+    private Key getSignInKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(this.key);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
 }

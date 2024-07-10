@@ -4,13 +4,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @Tag(name="Authentication")
+@Validated
 public class AuthController {
     private final AuthService authService;
 
@@ -18,7 +19,7 @@ public class AuthController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<?> register(
             @Valid @RequestBody RegistrationRequest request
-    ) {
+    ){
         authService.register(request);
         return ResponseEntity.accepted().build();
     }
