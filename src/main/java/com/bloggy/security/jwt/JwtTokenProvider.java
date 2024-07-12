@@ -1,4 +1,4 @@
-package com.bloggy.jwt;
+package com.bloggy.security.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -56,21 +56,6 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-//    public String createToken(UserDetails userDetails) {
-//        return createToken(new HashMap<>(), userDetails);
-//    }
-//
-//    public String createToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-//        return Jwts
-//                .builder()
-//                .setClaims(extraClaims)
-//                .setSubject(userDetails.getUsername())
-//                .setIssuedAt(new Date(System.currentTimeMillis()))
-//                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-//                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-//                .compact();
-//    }
-    
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
