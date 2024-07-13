@@ -8,4 +8,5 @@ import lombok.Data;
 public class BlogResponse {
     private String title;
     private String content;
+    private boolean isPublic;
 }

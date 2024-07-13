@@ -26,6 +26,9 @@ public class Blog {
     @Column(name = "content")
     private String content;
 
+    @Column(name="is_public")
+    private boolean isPublic;
+
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "user_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
