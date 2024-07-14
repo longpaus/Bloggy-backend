@@ -4,8 +4,8 @@ import com.bloggy.user.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper
-public interface BlogMapper {
+@Mapper(componentModel = "spring")
+public interface IBlogMapper {
 
     @Mapping(target = "user", source = "user")
     @Mapping(target = "id", ignore = true)

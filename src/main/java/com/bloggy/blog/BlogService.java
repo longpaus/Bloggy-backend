@@ -15,7 +15,7 @@ public class BlogService implements IBlogService {
 
     private final IBlogRepository blogRepository;
     private final IUserRepository userRepository;
-    private final BlogMapper blogMapper;
+    private final IBlogMapper blogMapper;
 
     @Override
     public BlogResponse createBlog(BlogRequest newBlog, String email) {

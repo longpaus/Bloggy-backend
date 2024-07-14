@@ -1,5 +1,6 @@
 package com.bloggy.config;
 
+import com.bloggy.blog.IBlogMapper;
 import com.bloggy.user.IUserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
