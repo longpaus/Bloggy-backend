@@ -9,5 +9,5 @@ public interface IBlogService {
 
     void deleteBlog(Long blogId, String email);
 
-    List<BlogResponse> getAllBlogs(String email);
+    List<BlogResponse> getUserBlogs(String email);
 }

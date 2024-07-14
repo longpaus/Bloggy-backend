@@ -18,8 +18,8 @@ public class BlogController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/")
-    public ResponseEntity<List<BlogResponse>> getAllBlogs(Principal principal) {
-        return ResponseEntity.status(HttpStatus.OK).body(service.getAllBlogs(principal.getName()));
+    public ResponseEntity<List<BlogResponse>> getUserBlogs(Principal principal) {
+        return ResponseEntity.status(HttpStatus.OK).body(service.getUserBlogs(principal.getName()));
     }
 
     @PostMapping("/")

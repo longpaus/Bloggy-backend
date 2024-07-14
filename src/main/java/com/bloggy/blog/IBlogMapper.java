@@ -11,5 +11,6 @@ public interface IBlogMapper {
     @Mapping(target = "id", ignore = true)
     Blog BlogReqestToBlog(BlogRequest blogRequest, User user);
 
+    @Mapping(target = "id", source = "id")
     BlogResponse BlogToBlogResponse(Blog blog);
 }

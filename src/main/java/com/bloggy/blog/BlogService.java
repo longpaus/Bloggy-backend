@@ -21,7 +21,7 @@ public class BlogService implements IBlogService {
     public BlogResponse createBlog(BlogRequest newBlog, String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IdNotFoundException("user email not found"));
-        Blog blog = blogMapper.BlogReqestToBlog(newBlog,user);
+        Blog blog = blogMapper.BlogReqestToBlog(newBlog, user);
         Blog savedBlog = blogRepository.save(blog);
         return blogMapper.BlogToBlogResponse(savedBlog);
     }
@@ -32,7 +32,7 @@ public class BlogService implements IBlogService {
                 .orElseThrow(() -> new IdNotFoundException("user email not found"));
         Blog blog = blogRepository.findById(blogId)
                 .orElseThrow(() -> new IdNotFoundException("blog not found"));
-        if(!user.getId().equals(blog.getUser().getId())) {
+        if (!user.getId().equals(blog.getUser().getId())) {
             throw new UnauthorizedException("user not authorized to update this blog");
         }
         Blog newBlog = blogMapper.BlogReqestToBlog(updatedBlog, user);
@@ -45,14 +45,14 @@ public class BlogService implements IBlogService {
                 .orElseThrow(() -> new IdNotFoundException("user email not found"));
         Blog blog = blogRepository.findById(blogId)
                 .orElseThrow(() -> new IdNotFoundException("blog not found"));
-        if(!user.getId().equals(blog.getUser().getId())) {
+        if (!user.getId().equals(blog.getUser().getId())) {
             throw new UnauthorizedException("user not authorized to delete blog");
         }
         blogRepository.delete(blog);
     }
 
     @Override
-    public List<BlogResponse> getAllBlogs(String email) {
+    public List<BlogResponse> getUserBlogs(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IdNotFoundException("user email not found"));
         return blogRepository
