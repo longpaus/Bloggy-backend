@@ -2,10 +2,7 @@ package com.bloggy.blogVersion;
 
 import com.bloggy.blog.Blog;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -14,6 +11,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 @Entity
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "blog_versions")

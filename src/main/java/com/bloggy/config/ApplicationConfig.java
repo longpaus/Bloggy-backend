@@ -1,6 +1,5 @@
 package com.bloggy.config;
 
-import com.bloggy.blog.IBlogMapper;
 import com.bloggy.user.IUserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class ApplicationConfig {
 
     private final IUserRepository userRepository;
+
     @Bean
     public UserDetailsService userDetailsService() {
         return new UserDetailsService() {
@@ -34,7 +34,7 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws  Exception{
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
