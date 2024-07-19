@@ -5,10 +5,10 @@ import com.bloggy.blog.IBlogRepository;
 import com.bloggy.user.IUserRepository;
 import com.bloggy.user.Role;
 import com.bloggy.user.User;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,6 +16,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
+@ActiveProfiles("test")  // Use a different profile for tests if needed
 public class BlogVersionRepositoryTest {
 
     @Autowired
@@ -26,11 +27,6 @@ public class BlogVersionRepositoryTest {
 
     @Autowired
     private IBlogVersionRepository blogVersionRepository;
-
-    @BeforeEach
-    public void setUp() {
-
-    }
 
     @Test
     public void testFindAllBlogVersions() {
@@ -82,6 +78,7 @@ public class BlogVersionRepositoryTest {
         // act
         List<BlogVersion> versions = blogVersionRepository.findAllByBlogId(blog.getId());
 
+        // assert
         assertEquals(3, versions.size());
         assertEquals(savedVersion1, versions.get(0));
         assertEquals(savedVersion2, versions.get(1));
