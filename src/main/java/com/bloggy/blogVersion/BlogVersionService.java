@@ -7,6 +7,7 @@ import com.bloggy.exception.UnauthorizedException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @AllArgsConstructor
@@ -17,14 +18,14 @@ public class BlogVersionService implements IBlogVersionService {
     private final IBlogVersionMapper blogVersionMapper;
 
     @Override
-    public BlogVersionResponse addVersion(BlogVersionRequest versionRequest, String userEmail) {
-        Blog blog = blogRepository.findById(versionRequest.getBlogId())
+    public BlogVersionResponse addVersion(BlogVersionRequest versionRequest, Long blogId, String userEmail) {
+        Blog blog = blogRepository.findById(blogId)
                 .orElseThrow(() -> new IdNotFoundException("Blog Id not found"));
         if (!blog.getUser().getEmail().equals(userEmail)) {
             throw new UnauthorizedException("User does not have permission to add version");
         }
 
-        BlogVersion blogVersion = blogVersionMapper.fromRequest(versionRequest, blog);
+        BlogVersion blogVersion = blogVersionMapper.fromRequest(versionRequest, blog, LocalDateTime.now());
         BlogVersion savedBlogVersion = blogVersionRepository.save(blogVersion);
         return blogVersionMapper.toResponse(savedBlogVersion);
     }

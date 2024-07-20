@@ -27,7 +27,7 @@ public class BlogVersion {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Blog blog;
 
-    @Column(name = "content")
+    @Column(name = "content", nullable = false)
     private String content;
 
     @Column(name = "time")

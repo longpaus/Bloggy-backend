@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface IBlogVersionService {
 
-    BlogVersionResponse addVersion(BlogVersionRequest version, String userEmail);
+    BlogVersionResponse addVersion(BlogVersionRequest version, Long blogId, String userEmail);
 
     List<BlogVersionResponse> getAllVersions(Long blogId, String userEmail);
 

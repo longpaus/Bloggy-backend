@@ -6,6 +6,5 @@ import lombok.Data;
 @Data
 @Builder
 public class BlogVersionRequest {
-    private Long blogId;
     private String content;
 }

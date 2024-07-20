@@ -38,7 +38,6 @@ public class BlogVersionMapperTest {
                 .build();
         BlogVersionRequest request = BlogVersionRequest
                 .builder()
-                .blogId(blog.getId())
                 .content("content of blog 1")
                 .build();
 
@@ -93,7 +92,6 @@ public class BlogVersionMapperTest {
 
         BlogVersionResponse expected = BlogVersionResponse.builder()
                 .id(blogVersion.getId())
-                .blogId(blog.getId())
                 .content(blogVersion.getContent())
                 .time(formattedTime)
                 .build();
