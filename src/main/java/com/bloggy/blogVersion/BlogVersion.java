@@ -1,6 +1,6 @@
-package com.bloggy.blog;
+package com.bloggy.blogVersion;
 
-import com.bloggy.user.User;
+import com.bloggy.blog.Blog;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,22 +9,27 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "blogs")
-public class Blog {
+@Table(name = "blog_versions")
+public class BlogVersion {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "title")
-    private String title;
-
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "blog_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private User user;
+    private Blog blog;
+
+    @Column(name = "content", nullable = false)
+    private String content;
+
+    @Column(name = "time")
+    private LocalDateTime time;
 }
