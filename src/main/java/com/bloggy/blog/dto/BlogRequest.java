@@ -1,4 +1,4 @@
-package com.bloggy.blog;
+package com.bloggy.blog.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
@@ -9,4 +9,8 @@ import lombok.Data;
 public class BlogRequest {
     @NotBlank(message = "title can't be blank")
     private String title;
+
+    private String content;
+
+    private String description;
 }

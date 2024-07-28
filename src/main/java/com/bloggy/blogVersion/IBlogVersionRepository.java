@@ -11,6 +11,9 @@ public interface IBlogVersionRepository extends JpaRepository<BlogVersion, Long>
     @Query(nativeQuery = true, value = "Select * From blog_versions Where blog_id = ?1")
     List<BlogVersion> findByBlogId(Long blogId, Pageable pageable);
 
+    @Query(value = "SELECT * FROM blog_versions WHERE id = ?1", nativeQuery = true)
+    BlogVersion findByVersionId(Long versionId);
+
     @Query("SELECT bv FROM BlogVersion bv " +
             "WHERE bv.blog.user.id = :userId AND bv.time = (" +
             "SELECT MAX(bv2.time) FROM BlogVersion bv2 " +

@@ -13,7 +13,6 @@ import javax.security.auth.Subject;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @Builder
@@ -28,7 +27,7 @@ public class User implements UserDetails, Principal {
     private Long id;
 
     @Column(unique = true)
-    private String username;
+    private String userName;
 
     @Column(unique = true)
     private String email;
@@ -37,6 +36,10 @@ public class User implements UserDetails, Principal {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    public String getUserName() {
+        return this.userName;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
