@@ -51,10 +51,10 @@ public interface IBlogService {
     /**
      * Given a blog id, get the blog versions of that blog id with pagination
      *
-     * @param blogId
-     * @param offset
-     * @param limit
-     * @return
+     * @param blogId - id of the blog that we want the versions of
+     * @param offset - the page number
+     * @param limit  - size of each page
+     * @return a BlogVersionResponse object
      */
     List<BlogVersionResponse> getBlogIdVersions(Long blogId, int offset, int limit);
 
@@ -62,6 +62,4 @@ public interface IBlogService {
 
     BlogVersionResponse saveBlog(BlogVersionRequest request, Long blogId, String email);
 
-
-    List<BlogVersionResponse> getBlogVersions(Long blogId, int offset, int limit, String email);
 }

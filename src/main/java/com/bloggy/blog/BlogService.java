@@ -117,18 +117,6 @@ public class BlogService implements IBlogService {
         return blogVersionMapper.toResponse(newVersion);
     }
 
-    @Override
-    public List<BlogVersionResponse> getBlogVersions(Long blogId, int offset, int limit, String email) {
-        getUserByEmail(email);
-        getBlogById(blogId);
-
-        Pageable pageable = PageRequest.of(offset / limit, limit);
-        List<BlogVersion> versions = blogVersionRepository.findByBlogId(blogId, pageable);
-        return versions
-                .stream()
-                .map(blogVersionMapper::toResponse)
-                .toList();
-    }
 
     private BlogVersion getLatestBlogVersion(Long blogId) {
         return blogVersionRepository.findFirstByBlogOrderByTimeDesc(blogId);

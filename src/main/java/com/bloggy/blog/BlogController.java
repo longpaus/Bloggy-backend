@@ -18,12 +18,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RestController("/api/v1/blogs")
+@RestController("/api/v1")
 public class BlogController {
 
     private final BlogService blogService;
 
-    @GetMapping
+    @GetMapping("/user/blogs")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<BlogMetaData>> getBlogs(
             Authentication auth,
@@ -33,21 +33,21 @@ public class BlogController {
         return ResponseEntity.ok(blogService.getUserBlogs(auth.getName(), offset, limit));
     }
 
-    @PostMapping
+    @PostMapping("/blogs")
     @ResponseStatus(HttpStatus.CREATED)
     @Description("create a new blog")
     public ResponseEntity<BlogResponse> createBlog(Authentication auth, @RequestBody BlogRequest blogRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(blogService.createBlog(blogRequest, auth.getName()));
     }
 
-    @PutMapping("/{blogId}")
+    @PutMapping("/blogs/{blogId}")
     @ResponseStatus(HttpStatus.OK)
     @Description("updates blog")
     public ResponseEntity<BlogResponse> updateBlog(Authentication auth, @PathVariable Long blogId, @RequestBody BlogRequest blogRequest) {
         return ResponseEntity.ok(blogService.updateBlog(blogRequest, blogId, auth.getName()));
     }
 
-    @GetMapping("/{blogId}/versions")
+    @GetMapping("/blogs/{blogId}/versions")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<BlogVersionResponse>> getBlogVersions(
             @PathVariable Long blogId,
@@ -56,7 +56,7 @@ public class BlogController {
         return ResponseEntity.ok(blogService.getBlogIdVersions(blogId, offset, limit));
     }
 
-    @PostMapping("/{blogId}/publish")
+    @PostMapping("/blogs/{blogId}/publish")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<PublishedBlogResponse> publishBlog(
             Authentication auth,
@@ -66,7 +66,8 @@ public class BlogController {
         return ResponseEntity.status(HttpStatus.CREATED).body(blogService.publishBlog(blogRequest, blogId, auth.getName()));
     }
 
-    @PostMapping("/{blogId}/versions")
+    @PostMapping("/blogs/{blogId}/versions")
+    @Description("save a blog content")
     public ResponseEntity<BlogVersionResponse> saveBlogVersion(
             Authentication auth,
             @PathVariable Long blogId,
