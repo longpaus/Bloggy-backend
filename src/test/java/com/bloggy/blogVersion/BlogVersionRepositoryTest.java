@@ -12,8 +12,10 @@ import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 public class BlogVersionRepositoryTest {
@@ -128,8 +130,10 @@ public class BlogVersionRepositoryTest {
             );
         }
         // act
-        BlogVersion version = blogVersionRepository.findFirstByBlogOrderByTimeDesc(blog.getId());
+        Optional<BlogVersion> opt = blogVersionRepository.findFirstByBlogOrderByTimeDesc(blog.getId());
 
+        assertTrue(opt.isPresent());
+        BlogVersion version = opt.get();
         // assert
         assertEquals(contents[contents.length - 1], version.getContent());
     }

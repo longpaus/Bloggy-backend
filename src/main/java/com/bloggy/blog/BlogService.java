@@ -81,9 +81,13 @@ public class BlogService implements IBlogService {
     }
 
     @Override
-    public List<BlogVersionResponse> getBlogIdVersions(Long blogId, int offset, int limit) {
+    public List<BlogVersionResponse> getBlogIdVersions(Long blogId, int offset, int limit, String email) {
         // check if blogId is valid
-        getBlogById(blogId);
+        User user = getUserByEmail(email);
+        Blog blog = getBlogById(blogId);
+        if (!user.getId().equals(blog.getUser().getId())) {
+            throw new UnauthorizedException("User not authorized to view the versions of this blog");
+        }
         Pageable pageable = PageRequest.of(offset / limit, limit);
 
         return blogVersionRepository
@@ -94,10 +98,23 @@ public class BlogService implements IBlogService {
     }
 
     @Override
+    public BlogVersionResponse getBlogVersion(Long versionId, String email) {
+        User user = getUserByEmail(email);
+        BlogVersion blogVersion = blogVersionRepository.findById(versionId)
+                .orElseThrow(() -> new IdNotFoundException("version Id not found"));
+        Blog blog = blogVersion.getBlog();
+        if (!user.getId().equals(blog.getUser().getId())) {
+            throw new UnauthorizedException("User not authorized to view the versions of this blog");
+        }
+        return blogVersionMapper.blogVersionToResponse(blogVersion);
+    }
+
+    @Override
     public PublishedBlogResponse publishBlog(PublishedBlogRequest publishedBlogRequest, Long blogId, String email) {
         getUserByEmail(email);
         Blog blog = getBlogById(blogId);
-        BlogVersion version = blogVersionRepository.findByVersionId(publishedBlogRequest.getVersionId());
+        BlogVersion version = blogVersionRepository.findById(publishedBlogRequest.getVersionId())
+                .orElseThrow(() -> new IdNotFoundException("version Id not found"));
 
         PublishedBlog publishedBlog = publishedBlogRepository.save(publishedBlogMapper.fromRequest(publishedBlogRequest, blog, version, LocalDateTime.now()));
         return publishedBlogMapper.toResponse(publishedBlog);
@@ -113,13 +130,14 @@ public class BlogService implements IBlogService {
             throw new UnauthorizedException("User not authorized to update this blog");
         }
 
-        BlogVersion newVersion = blogVersionMapper.fromRequest(request, blog, LocalDateTime.now());
-        return blogVersionMapper.toResponse(newVersion);
+        BlogVersion newVersion = blogVersionMapper.blogVersionRequestToBlogVersion(request, blog, LocalDateTime.now());
+        return blogVersionMapper.blogVersionToResponse(newVersion);
     }
 
 
     private BlogVersion getLatestBlogVersion(Long blogId) {
-        return blogVersionRepository.findFirstByBlogOrderByTimeDesc(blogId);
+        return blogVersionRepository.findFirstByBlogOrderByTimeDesc(blogId)
+                .orElseThrow(() -> new IdNotFoundException("blogId does not exist"));
     }
 
     private User getUserByEmail(String email) {

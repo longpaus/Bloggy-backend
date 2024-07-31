@@ -9,9 +9,17 @@ import java.time.LocalDateTime;
 
 @Mapper(componentModel = "spring")
 public interface IBlogVersionMapper {
+    /**
+     * Maps a BlogVersionRequest to BlogVersion.
+     *
+     * @param versionRequest the request object
+     * @param blog           the blog object of the blogVersion
+     * @param time           the time this version was created
+     * @return the mapped BlogVersion object
+     */
     @Mapping(target = "blog", source = "blog")
     @Mapping(target = "time", source = "time")
-    BlogVersion fromRequest(BlogVersionRequest versionRequest, Blog blog, LocalDateTime time);
+    BlogVersion blogVersionRequestToBlogVersion(BlogVersionRequest versionRequest, Blog blog, LocalDateTime time);
 
     @Mapping(target = "blog", source = "blog")
     @Mapping(target = "time", source = "time")
@@ -20,6 +28,4 @@ public interface IBlogVersionMapper {
     @Mapping(target = "time", source = "time", dateFormat = "mm.HH.dd.MM.yyyy")
     BlogVersionResponse blogVersionToResponse(BlogVersion blogVersion);
 
-    @Mapping(target = "time", source = "time", dateFormat = "mm.HH.dd.MM.yyyy")
-    BlogVersionResponse toResponse(BlogVersion blogVersion);
 }

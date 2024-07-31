@@ -54,9 +54,19 @@ public interface IBlogService {
      * @param blogId - id of the blog that we want the versions of
      * @param offset - the page number
      * @param limit  - size of each page
+     * @param email  - the email of the user requesting the request
      * @return a BlogVersionResponse object
      */
-    List<BlogVersionResponse> getBlogIdVersions(Long blogId, int offset, int limit);
+    List<BlogVersionResponse> getBlogIdVersions(Long blogId, int offset, int limit, String email);
+
+    /**
+     * Given a VersionId, get the version for that versionId
+     *
+     * @param versionId
+     * @param email-    the email of the user requesting the request
+     * @return
+     */
+    BlogVersionResponse getBlogVersion(Long versionId, String email);
 
     PublishedBlogResponse publishBlog(PublishedBlogRequest publishedBlogRequest, Long blogId, String email);
 

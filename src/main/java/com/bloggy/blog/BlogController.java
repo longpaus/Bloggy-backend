@@ -24,6 +24,7 @@ public class BlogController {
     private final BlogService blogService;
 
     @GetMapping("/user/blogs")
+    @Description("get blogs of user with pagination")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<BlogMetaData>> getBlogs(
             Authentication auth,
@@ -50,10 +51,20 @@ public class BlogController {
     @GetMapping("/blogs/{blogId}/versions")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<BlogVersionResponse>> getBlogVersions(
+            Authentication auth,
             @PathVariable Long blogId,
             @RequestParam(defaultValue = "20") int offset,
             @RequestParam(defaultValue = "20") int limit) {
-        return ResponseEntity.ok(blogService.getBlogIdVersions(blogId, offset, limit));
+        return ResponseEntity.ok(blogService.getBlogIdVersions(blogId, offset, limit, auth.getName()));
+    }
+
+    @GetMapping("/blogs/versions/{versionId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<BlogVersionResponse> getBlogVersion(
+            Authentication auth,
+            @PathVariable Long versionId
+    ) {
+        return ResponseEntity.ok(blogService.getBlogVersion(versionId, auth.getName()));
     }
 
     @PostMapping("/blogs/{blogId}/publish")
