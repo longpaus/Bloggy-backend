@@ -48,7 +48,7 @@ public class BlogVersionMapperTest {
                 .id(1L)
                 .build();
         // act
-        BlogVersion blogVersion = blogVersionMapper.fromRequest(request, blog, today);
+        BlogVersion blogVersion = blogVersionMapper.blogVersionRequestToBlogVersion(request, blog, today);
 
         // assert
         assertNotNull(blogVersion);
@@ -56,7 +56,7 @@ public class BlogVersionMapperTest {
     }
 
     @Test
-    public void testToResponse() {
+    public void test_blogVersionToResponse() {
         int year = 2024;
         int month = 9;
         int day = 21;
@@ -96,7 +96,7 @@ public class BlogVersionMapperTest {
                 .time(formattedTime)
                 .build();
         // act
-        BlogVersionResponse response = blogVersionMapper.toResponse(blogVersion);
+        BlogVersionResponse response = blogVersionMapper.blogVersionToResponse(blogVersion);
         assertNotNull(response);
         assertEquals(expected, response);
     }

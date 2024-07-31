@@ -7,7 +7,6 @@ import lombok.Data;
 @Builder
 public class BlogVersionResponse {
     private Long id;
-    private String title;
     private String content;
     private String time;
 }

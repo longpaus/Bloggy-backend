@@ -12,8 +12,10 @@ import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 public class BlogVersionRepositoryTest {
@@ -33,7 +35,7 @@ public class BlogVersionRepositoryTest {
                 .password("password")
                 .role(Role.USER)
                 .email("longpaus@gmail.com")
-                .username("long")
+                .userName("long")
                 .build()
         );
         Blog blog = blogRepository.save(Blog.builder()
@@ -73,7 +75,7 @@ public class BlogVersionRepositoryTest {
                 .password("password")
                 .role(Role.USER)
                 .email("longpaus@gmail.com")
-                .username("long")
+                .userName("long")
                 .build()
         );
         String[] blog1Contents = {"content 1", "content 2", "content 3", "content 4"};
@@ -109,7 +111,7 @@ public class BlogVersionRepositoryTest {
                 .password("password")
                 .role(Role.USER)
                 .email("longpaus@gmail.com")
-                .username("long")
+                .userName("long")
                 .build()
         );
         Blog blog = blogRepository.save(Blog.builder()
@@ -128,8 +130,10 @@ public class BlogVersionRepositoryTest {
             );
         }
         // act
-        BlogVersion version = blogVersionRepository.findFirstByBlogOrderByTimeDesc(blog.getId());
+        Optional<BlogVersion> opt = blogVersionRepository.findFirstByBlogOrderByTimeDesc(blog.getId());
 
+        assertTrue(opt.isPresent());
+        BlogVersion version = opt.get();
         // assert
         assertEquals(contents[contents.length - 1], version.getContent());
     }

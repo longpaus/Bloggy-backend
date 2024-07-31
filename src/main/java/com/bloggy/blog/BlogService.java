@@ -1,5 +1,8 @@
 package com.bloggy.blog;
 
+import com.bloggy.blog.dto.BlogMetaData;
+import com.bloggy.blog.dto.BlogRequest;
+import com.bloggy.blog.dto.BlogResponse;
 import com.bloggy.blogVersion.*;
 import com.bloggy.exception.IdNotFoundException;
 import com.bloggy.exception.UnauthorizedException;
@@ -32,20 +35,24 @@ public class BlogService implements IBlogService {
     @Override
     public BlogResponse createBlog(BlogRequest newBlog, String email) {
         User user = getUserByEmail(email);
-        Blog blog = blogMapper.BlogReqestToBlog(newBlog, user);
-        Blog savedBlog = blogRepository.save(blog);
-        return blogMapper.BlogToBlogResponse(savedBlog);
+        Blog blog = blogRepository.save(blogMapper.BlogReqestToBlog(newBlog, user));
+
+        blogVersionRepository.save(blogVersionMapper.blogRequestToBlogVersion(newBlog, blog, LocalDateTime.now()));
+        return blogMapper.blogToBlogResponse(blog, newBlog.getContent(), user);
     }
 
     @Override
-    public BlogResponse updateBlog(BlogRequest updatedBlog, Long blogId, String email) {
+    public BlogResponse updateBlog(BlogRequest blogRequest, Long blogId, String email) {
         User user = getUserByEmail(email);
         Blog blog = getBlogById(blogId);
         if (!user.getId().equals(blog.getUser().getId())) {
             throw new UnauthorizedException("user not authorized to update this blog");
         }
-        Blog newBlog = blogMapper.BlogReqestToBlog(updatedBlog, user);
-        return blogMapper.BlogToBlogResponse(blogRepository.save(newBlog));
+        BlogVersion latestVersion = getLatestBlogVersion(blogId);
+        if (!latestVersion.getContent().equals(blogRequest.getContent())) {
+            blogVersionRepository.save(blogVersionMapper.blogRequestToBlogVersion(blogRequest, blog, LocalDateTime.now()));
+        }
+        return blogMapper.blogToBlogResponse(blog, blogRequest.getContent(), user);
     }
 
     @Override
@@ -59,18 +66,58 @@ public class BlogService implements IBlogService {
     }
 
     @Override
-    public List<BlogVersionResponse> getUserBlogs(String email, int offset, int limit) {
+    public List<BlogMetaData> getUserBlogs(String email, int offset, int limit) {
         if (offset < 0 || limit < 0) {
             throw new RuntimeException("offset or limit is negative");
         }
         User user = getUserByEmail(email);
 
         Pageable pageable = PageRequest.of(offset / limit, limit);
-        return blogVersionRepository
-                .findLatestBlogVersionsByUserId(user.getId(), pageable)
+        return blogRepository
+                .findAllByUserId(user.getId(), pageable)
                 .stream()
-                .map(blogVersionMapper::toResponse)
+                .map(blogMapper::blogToBlogMetaData)
                 .toList();
+    }
+
+    @Override
+    public List<BlogVersionResponse> getBlogIdVersions(Long blogId, int offset, int limit, String email) {
+        // check if blogId is valid
+        User user = getUserByEmail(email);
+        Blog blog = getBlogById(blogId);
+        if (!user.getId().equals(blog.getUser().getId())) {
+            throw new UnauthorizedException("User not authorized to view the versions of this blog");
+        }
+        Pageable pageable = PageRequest.of(offset / limit, limit);
+
+        return blogVersionRepository
+                .findByBlogId(blogId, pageable)
+                .stream()
+                .map(blogVersionMapper::blogVersionToResponse)
+                .toList();
+    }
+
+    @Override
+    public BlogVersionResponse getBlogVersion(Long versionId, String email) {
+        User user = getUserByEmail(email);
+        BlogVersion blogVersion = blogVersionRepository.findById(versionId)
+                .orElseThrow(() -> new IdNotFoundException("version Id not found"));
+        Blog blog = blogVersion.getBlog();
+        if (!user.getId().equals(blog.getUser().getId())) {
+            throw new UnauthorizedException("User not authorized to view the versions of this blog");
+        }
+        return blogVersionMapper.blogVersionToResponse(blogVersion);
+    }
+
+    @Override
+    public PublishedBlogResponse publishBlog(PublishedBlogRequest publishedBlogRequest, Long blogId, String email) {
+        getUserByEmail(email);
+        Blog blog = getBlogById(blogId);
+        BlogVersion version = blogVersionRepository.findById(publishedBlogRequest.getVersionId())
+                .orElseThrow(() -> new IdNotFoundException("version Id not found"));
+
+        PublishedBlog publishedBlog = publishedBlogRepository.save(publishedBlogMapper.fromRequest(publishedBlogRequest, blog, version, LocalDateTime.now()));
+        return publishedBlogMapper.toResponse(publishedBlog);
     }
 
     @Override
@@ -83,59 +130,14 @@ public class BlogService implements IBlogService {
             throw new UnauthorizedException("User not authorized to update this blog");
         }
 
-        BlogVersion newVersion = createNewVersion(blog, request);
-        return blogVersionMapper.toResponse(newVersion);
+        BlogVersion newVersion = blogVersionMapper.blogVersionRequestToBlogVersion(request, blog, LocalDateTime.now());
+        return blogVersionMapper.blogVersionToResponse(newVersion);
     }
 
-    @Override
-    public PublishedBlogResponse publishBlog(Long blogId, PublishedBlogRequest request, String email) {
-        User user = getUserByEmail(email);
-        Blog blog = getBlogById(blogId);
-        if (!user.getId().equals(blog.getUser().getId())) {
-            throw new UnauthorizedException("User not authorized to publish this blog");
-        }
-        BlogVersion latestVersion = getLatestBlogVersion(blogId);
-        if (!latestVersion.getContent().equals(request.getContent())) {
-            latestVersion = createNewVersion(blog, request);
-        }
-        return publishedBlogMapper.toResponse(createNewPublishedBlog(blog, request, latestVersion));
-    }
-
-
-    @Override
-    public List<BlogVersionResponse> getBlogVersions(Long blogId, int offset, int limit, String email) {
-        getUserByEmail(email);
-        getBlogById(blogId);
-
-        Pageable pageable = PageRequest.of(offset / limit, limit);
-        List<BlogVersion> versions = blogVersionRepository.findByBlogId(blogId, pageable);
-        return versions
-                .stream()
-                .map(blogVersionMapper::toResponse)
-                .toList();
-    }
 
     private BlogVersion getLatestBlogVersion(Long blogId) {
-        return blogVersionRepository.findFirstByBlogOrderByTimeDesc(blogId);
-    }
-
-    private PublishedBlog createNewPublishedBlog(Blog blog, PublishedBlogRequest request, BlogVersion version) {
-        PublishedBlog publishedBlog = publishedBlogMapper.fromRequest(request, blog, version, LocalDateTime.now());
-        return publishedBlogRepository.save(publishedBlog);
-    }
-
-    private BlogVersion createNewVersion(Blog blog, BlogVersionRequest request) {
-        BlogVersion version = blogVersionMapper.fromRequest(request, blog, LocalDateTime.now());
-        return blogVersionRepository.save(version);
-    }
-
-    private BlogVersion createNewVersion(Blog blog, PublishedBlogRequest request) {
-        BlogVersion version = BlogVersion.builder()
-                .blog(blog)
-                .time(LocalDateTime.now())
-                .content(request.getContent())
-                .build();
-        return blogVersionRepository.save(version);
+        return blogVersionRepository.findFirstByBlogOrderByTimeDesc(blogId)
+                .orElseThrow(() -> new IdNotFoundException("blogId does not exist"));
     }
 
     private User getUserByEmail(String email) {

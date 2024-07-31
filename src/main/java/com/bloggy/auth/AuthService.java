@@ -23,18 +23,19 @@ public class AuthService {
 
     public void register(RegistrationRequest request) {
         Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
-        if(existingUser.isPresent()) {
+        if (existingUser.isPresent()) {
             throw new RuntimeException("Email already exists");
         }
         User user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
-                .username(request.getUsername())
+                .email(request.getUsername())
                 .build();
 
         userRepository.save(user);
     }
+
     public AuthResponse authenticate(AuthRequest request) {
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
